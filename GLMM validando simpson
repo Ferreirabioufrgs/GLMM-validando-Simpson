@@ -1,0 +1,121 @@
+library(dplyr)
+library(vegan)
+library(readxl)
+library(stringr)
+library(tibble)
+library(tidyr)
+library (multcomp)
+library(MASS)
+dados0 <- read_excel("Pasta1.xlsx", sheet = "plots", col_names = TRUE)
+dados = dados0;dados$Code=NULL;rownames(dados) = dados0$Code; dados <- as.numeric(dados0)
+
+
+ACE <- dados %>%
+  filter(str_detect(rownames(.), "ACE"))
+
+ALE <- dados %>%
+  filter(str_detect(rownames(.), "ALE")) 
+
+ARA <- dados %>%
+  filter(str_detect(rownames(.), "ARA")) 
+
+LAV <- dados %>%
+  filter(str_detect(rownames(.), "LAV")) 
+
+TAI <- dados %>%
+  filter(str_detect(rownames(.), "TAI")) 
+
+TAV <- dados %>%
+  filter(str_detect(rownames(.), "TAV")) 
+
+VAC <- dados %>%
+  filter(str_detect(rownames(.), "VAC"))
+
+
+simpson_res_ACE <- diversity(ACE, index = "simpson", MARGIN = 1) 
+simpson_res_ACE <- data.frame(Simpson = simpson_res_ACE)
+simpson_res_ACE <- data.frame(Simpson = simpson_res_ACE)
+simpson_res_ACE2 <- rownames_to_column(simpson_res_ACE, var = "Trat")
+simpson_res_ACE3 <- separate(simpson_res_ACE2, col = Trat, into = c("Local", "Tratamento"), sep = "_")
+rownames(simpson_res_ACE3)= rownames(simpson_res_ACE)
+
+simpson_res_ALE <- diversity(ALE, index = "simpson", MARGIN = 1) 
+simpson_res_ALE <- data.frame(Simpson = simpson_res_ALE)
+simpson_res_ALE <- data.frame(Simpson = simpson_res_ALE)
+simpson_res_ALE2 <- rownames_to_column(simpson_res_ALE, var = "Trat")
+simpson_res_ALE3 <- separate(simpson_res_ALE2, col = Trat, into = c("Local", "Tratamento"), sep = "_")
+rownames(simpson_res_ALE3)= rownames(simpson_res_ALE)
+
+simpson_res_ARA <- diversity(ARA, index = "simpson", MARGIN = 1) 
+simpson_res_ARA <- data.frame(Simpson = simpson_res_ARA)
+simpson_res_ARA <- data.frame(Simpson = simpson_res_ARA)
+simpson_res_ARA2 <- rownames_to_column(simpson_res_ARA, var = "Trat")
+simpson_res_ARA3 <- separate(simpson_res_LAV2, col = Trat, into = c("Local", "Tratamento"), sep = "_")
+rownames(simpson_res_ARA)= rownames(simpson_res_ARA)
+
+simpson_res_LAV <- diversity(LAV, index = "simpson", MARGIN = 1) 
+simpson_res_LAV <- data.frame(Simpson = simpson_res_LAV)
+simpson_res_LAV <- data.frame(Simpson = simpson_res_LAV)
+simpson_res_LAV2 <- rownames_to_column(simpson_res_LAV, var = "Trat")
+simpson_res_LAV3 <- separate(simpson_res_LAV2, col = Trat, into = c("Local", "Tratamento"), sep = "_")
+rownames(simpson_res_LAV3)= rownames(simpson_res_LAV)
+
+simpson_res_TAI <- diversity(TAI, index = "simpson", MARGIN = 1) 
+simpson_res_TAI <- data.frame(Simpson = simpson_res_TAI)
+simpson_res_TAI <- data.frame(Simpson = simpson_res_TAI)
+simpson_res_TAI2 <- rownames_to_column(simpson_res_TAI, var = "Trat")
+simpson_res_TAI3 <- separate(simpson_res_TAI2, col = Trat, into = c("Local", "Tratamento"), sep = "_")
+rownames(simpson_res_TAI3)= rownames(simpson_res_TAI)
+
+simpson_res_TAV <- diversity(TAV, index = "simpson", MARGIN = 1) 
+simpson_res_TAV <- data.frame(Simpson = simpson_res_TAV)
+simpson_res_TAV <- data.frame(Simpson = simpson_res_TAV)
+simpson_res_TAV2 <- rownames_to_column(simpson_res_TAV, var = "Trat")
+simpson_res_TAV3 <- separate(simpson_res_TAV2, col = Trat, into = c("Local", "Tratamento"), sep = "_")
+rownames(simpson_res_TAV3)= rownames(simpson_res_TAV)
+
+simpson_res_VAC <- diversity(VAC, index = "simpson", MARGIN = 1) 
+simpson_res_VAC <- data.frame(Simpson = simpson_res_VAC)
+simpson_res_VAC2 <- rownames_to_column(simpson_res_VAC, var = "Trat")
+simpson_res_VAC3 <- separate(simpson_res_VAC2, col = Trat, into = c("Local", "Tratamento"), sep = "_")
+rownames(simpson_res_VAC3)= rownames(simpson_res_VAC)
+
+
+locais <- c("ARA", "ALE", "ACE", "TAI", "TAV", "LAV", "VAC")
+tratamentos <- c("CONS", "CONV", "EXCL")
+simpson_res_ACE3$Tratamento <- factor(simpson_res_ACE3$Tratamento)
+simpson_res_ALE3$Tratamento <- factor(simpson_res_ALE3$Tratamento)
+simpson_res_ARA3$Tratamento <- factor(simpson_res_ARA3$Tratamento)
+simpson_res_LAV3$Tratamento <- factor(simpson_res_LAV3$Tratamento)
+simpson_res_TAI3$Tratamento <- factor(simpson_res_TAI3$Tratamento)
+simpson_res_TAV3$Tratamento <- factor(simpson_res_TAV3$Tratamento)
+simpson_res_VAC3$Tratamento <- factor(simpson_res_VAC3$Tratamento)
+
+options(scipen = 9999)
+modeloACE <- glmmPQL(Simpson ~ Tratamento, random = ~ 1 | Local, data = simpson_res_ACE3, family = quasibinomial)
+mcACE <- glht(modeloACE, mcp(Tratamento = c("CONS - CONV = 0", "CONS - EXCL = 0", "CONV - EXCL = 0")))
+summary(mcACE)
+
+modeloALE <- glmmPQL(Simpson ~ Tratamento, random = ~ 1 | Local, data = simpson_res_ALE3, family = quasibinomial)
+mcALE <- glht(modeloALE, mcp(Tratamento = c("CONS - CONV = 0", "CONS - EXCL = 0", "CONV - EXCL = 0")))
+summary(mcALE)
+
+modeloARA <- glmmPQL(Simpson ~ Tratamento, random = ~ 1 | Local, data = simpson_res_ARA3, family = quasibinomial)
+mcARA <- glht(modeloARA, mcp(Tratamento = c("CONS - CONV = 0", "CONS - EXCL = 0", "CONV - EXCL = 0")))
+summary(mcARA)
+
+modeloLAV <- glmmPQL(Simpson ~ Tratamento, random = ~ 1 | Local, data = simpson_res_LAV3, family = quasibinomial)
+mcLAV <- glht(modeloLAV, mcp(Tratamento = c("CONS - CONV = 0", "CONS - EXCL = 0", "CONV - EXCL = 0")))
+summary(mcLAV)
+
+modeloTAI <- glmmPQL(Simpson ~ Tratamento, random = ~ 1 | Local, data = simpson_res_TAI3, family = quasibinomial)
+mcTAI <- glht(modeloTAI, mcp(Tratamento = c("CONS - CONV = 0", "CONS - EXCL = 0", "CONV - EXCL = 0")))
+summary(mcTAI)
+
+modeloTAV <- glmmPQL(Simpson ~ Tratamento, random = ~ 1 | Local, data = simpson_res_TAV3, family = quasibinomial)
+mcTAV <- glht(modeloTAV, mcp(Tratamento = c("CONS - CONV = 0", "CONS - EXCL = 0", "CONV - EXCL = 0")))
+summary(mcTAV)
+
+modeloVAC <- glmmPQL(Simpson ~ Tratamento, random = ~ 1 | Local, data = simpson_res_VAC3, family = quasibinomial)
+mcVAC <- glht(modeloVAC, mcp(Tratamento = c("CONS - CONV = 0", "CONS - EXCL = 0", "CONV - EXCL = 0")))
+summary(mcVAC)
